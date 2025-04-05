@@ -1,34 +1,40 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-import openai
-import os
 from dotenv import load_dotenv
+import os
+from openai import OpenAI
 
+# Load environment variables from .env
 load_dotenv()
 
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Set up OpenAI client
+openai_api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=openai_api_key)
 
-@app.route('/')
-def serve_chatbot_ui():
-    return send_from_directory('.', 'chatbot.html')
-
-@app.route('/chat', methods=['POST'])
+# Define the chat endpoint
+@app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
-    user_message = data.get("message", "")
-
-    if not user_message:
-        return jsonify({"response": "Please say something!"})
+    user_input = data.get("message", "")
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": user_message}],
-            temperature=0.7,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant for Beibei Amigos Preschool."},
+                {"role": "user", "content": user_input}
+            ]
         )
-        return jsonify({"response": response['choices'][0]['message']['content']})
+        reply = response.choices[0].message.content.strip()
+        return jsonify({"response": reply})
+
     except Exception as e:
         return jsonify({"response": f"Error: {str(e)}"})
+
+# Run the app locally (not needed on Render, but useful for testing)
+if __name__ == "__main__":
+    app.run(debug=True)
