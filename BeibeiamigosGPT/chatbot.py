@@ -4,18 +4,17 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
-# Load environment variables from .env
+# Load environment variables
 load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
 
-# Initialize Flask app
+# Initialize OpenAI client
+client = OpenAI(api_key=api_key)
+
+# Flask app setup
 app = Flask(__name__)
 CORS(app)
 
-# Set up OpenAI client
-openai_api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=openai_api_key)
-
-# Define the chat endpoint
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
@@ -29,12 +28,12 @@ def chat():
                 {"role": "user", "content": user_input}
             ]
         )
-        reply = response.choices[0].message.content.strip()
+        reply = response.choices[0].message.content
         return jsonify({"response": reply})
 
     except Exception as e:
         return jsonify({"response": f"Error: {str(e)}"})
 
-# Run the app locally (not needed on Render, but useful for testing)
 if __name__ == "__main__":
     app.run(debug=True)
+
