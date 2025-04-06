@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from openai import OpenAI
 from dotenv import load_dotenv
 import os
-from openai import OpenAI
 
 # Load environment variables
 load_dotenv()
@@ -24,16 +24,14 @@ def chat():
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant for Beibei Amigos Preschool."},
+                {"role": "system", "content": "You are a helpful preschool assistant."},
                 {"role": "user", "content": user_input}
             ]
         )
-        reply = response.choices[0].message.content
-        return jsonify({"response": reply})
-
+        answer = response.choices[0].message.content.strip()
+        return jsonify({"response": answer})
     except Exception as e:
-        return jsonify({"response": f"Error: {str(e)}"})
+        return jsonify({"response": f"Error: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
-
