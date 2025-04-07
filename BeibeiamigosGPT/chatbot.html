@@ -35,8 +35,9 @@
             document.getElementById("user-input").value = "";  // Clear input field
 
             try {
-                let response = await fetch("/chat", {
+                let response = await fetch("https://beibeiamigosgpt.onrender.com/chat", {
     method: "POST",
+    
 
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: userMessage })

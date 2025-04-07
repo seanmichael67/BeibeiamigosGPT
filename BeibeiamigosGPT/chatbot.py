@@ -1,37 +1,85 @@
+import openai
+import os
+import time
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from openai import OpenAI
 from dotenv import load_dotenv
-import os
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Initialize OpenAI client
-client = OpenAI(api_key=api_key)
+# Replace with your actual Assistant ID
+ASSISTANT_ID = "asst_vCKTsoryISAi0vnXRzlTRg7r"  # 👈 Replace this with your real assistant ID
 
-# Flask app setup
+# Set up Flask app
 app = Flask(__name__)
 CORS(app)
 
+# Chat function using Assistants API
+def get_chatbot_response(user_message):
+    try:
+        print("📩 New message from user:", user_message)
+
+        # Step 1: Create a new thread
+        thread = openai.beta.threads.create()
+        print("🧵 Thread created:", thread.id)
+
+        # Step 2: Add user's message to the thread
+        openai.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=user_message
+        )
+        print("✅ Message added to thread.")
+
+        # Step 3: Start the assistant run
+        run = openai.beta.threads.runs.create(
+            thread_id=thread.id,
+            assistant_id=ASSISTANT_ID
+        )
+        print("⚙️ Assistant run started:", run.id)
+
+        # Step 4: Wait for the assistant to complete
+        while True:
+            run_status = openai.beta.threads.runs.retrieve(
+                thread_id=thread.id,
+                run_id=run.id
+            )
+            print("⏳ Waiting... Status =", run_status.status)
+            if run_status.status == "completed":
+                break
+            elif run_status.status == "failed":
+                print("❌ Assistant run failed.")
+                return "Sorry, something went wrong."
+            time.sleep(1)
+
+        # Step 5: Retrieve the assistant's response
+        messages = openai.beta.threads.messages.list(thread_id=thread.id)
+        reply = messages.data[0].content[0].text.value
+        print("🤖 Assistant response:", reply)
+        return reply
+
+    except Exception as e:
+        print("🔥 Error:", str(e))
+        return f"Error: {str(e)}"
+
+# Endpoint for website to send messages to
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.get_json()
-    user_input = data.get("message", "")
+    data = request.json
+    user_message = data.get("message", "")
+    chatbot_response = get_chatbot_response(user_message)
+    return jsonify({"response": chatbot_response})
 
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful preschool assistant."},
-                {"role": "user", "content": user_input}
-            ]
-        )
-        answer = response.choices[0].message.content.strip()
-        return jsonify({"response": answer})
-    except Exception as e:
-        return jsonify({"response": f"Error: {str(e)}"}), 500
-
+# Initial test and start Flask app
 if __name__ == "__main__":
-    app.run(debug=True)
+    print("🔍 Testing GPT Assistant...")
+    test_response = get_chatbot_response("What languages do you teach?")
+    print("✅ Assistant test response:", test_response)
+
+    print("🚀 Starting Flask server...")
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
+
+
