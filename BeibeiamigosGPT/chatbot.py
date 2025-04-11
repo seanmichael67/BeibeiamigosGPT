@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, render_template
 from dotenv import load_dotenv
 import openai
 import os
@@ -12,6 +12,10 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Your Assistant ID from OpenAI platform
 tutti_assistant_id = "asst_vCKTsoryISAi0vnXRzlTRg7r"
+
+@app.route("/")
+def home():
+    return render_template("chatbot.html")
 
 @app.route("/chat", methods=["POST"])
 def chat():
