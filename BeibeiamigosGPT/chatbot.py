@@ -1,7 +1,7 @@
 import openai
 import os
 import time
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -10,7 +10,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Replace with your actual Assistant ID
-ASSISTANT_ID = "asst_vCKTsoryISAi0vnXRzlTRg7r"  # 👈 Replace this with your real assistant ID
+ASSISTANT_ID = "asst_vCKTsoryISAi0vnXRzlTRg7r"
 
 # Set up Flask app
 app = Flask(__name__)
@@ -64,7 +64,12 @@ def get_chatbot_response(user_message):
         print("🔥 Error:", str(e))
         return f"Error: {str(e)}"
 
-# Endpoint for website to send messages to
+# Endpoint to serve the chatbot UI
+@app.route("/")
+def serve_index():
+    return send_from_directory('.', 'chatbot.html')
+
+# Endpoint to handle messages from the frontend
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.json
@@ -80,6 +85,3 @@ if __name__ == "__main__":
 
     print("🚀 Starting Flask server...")
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-
-
