@@ -1,87 +1,64 @@
+from flask import Flask, request, jsonify, session
+from dotenv import load_dotenv
 import openai
 import os
 import time
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
+app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
+
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Replace with your actual Assistant ID
-ASSISTANT_ID = "asst_vCKTsoryISAi0vnXRzlTRg7r"
+# Your Assistant ID from OpenAI platform
+tutti_assistant_id = "asst_vCKTsoryISAi0vnXRzlTRg7r"
 
-# Set up Flask app
-app = Flask(__name__)
-CORS(app)
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json.get("message")
+    if not user_input:
+        return jsonify({"error": "No message provided"}), 400
 
-# Chat function using Assistants API
-def get_chatbot_response(user_message):
     try:
-        print("📩 New message from user:", user_message)
+        # Create or reuse a thread for this session
+        if 'thread_id' not in session:
+            thread = openai.beta.threads.create()
+            session['thread_id'] = thread.id
+        thread_id = session['thread_id']
 
-        # Step 1: Create a new thread
-        thread = openai.beta.threads.create()
-        print("🧵 Thread created:", thread.id)
-
-        # Step 2: Add user's message to the thread
+        # Post the user's message to the thread
         openai.beta.threads.messages.create(
-            thread_id=thread.id,
+            thread_id=thread_id,
             role="user",
-            content=user_message
+            content=user_input
         )
-        print("✅ Message added to thread.")
 
-        # Step 3: Start the assistant run
+        # Run the assistant
         run = openai.beta.threads.runs.create(
-            thread_id=thread.id,
-            assistant_id=ASSISTANT_ID
+            thread_id=thread_id,
+            assistant_id=tutti_assistant_id
         )
-        print("⚙️ Assistant run started:", run.id)
 
-        # Step 4: Wait for the assistant to complete
+        # Poll until the run is completed
         while True:
             run_status = openai.beta.threads.runs.retrieve(
-                thread_id=thread.id,
+                thread_id=thread_id,
                 run_id=run.id
             )
-            print("⏳ Waiting... Status =", run_status.status)
             if run_status.status == "completed":
                 break
             elif run_status.status == "failed":
-                print("❌ Assistant run failed.")
-                return "Sorry, something went wrong."
+                return jsonify({"error": "Assistant run failed"}), 500
             time.sleep(1)
 
-        # Step 5: Retrieve the assistant's response
-        messages = openai.beta.threads.messages.list(thread_id=thread.id)
-        reply = messages.data[0].content[0].text.value
-        print("🤖 Assistant response:", reply)
-        return reply
+        # Retrieve the assistant's response
+        messages = openai.beta.threads.messages.list(thread_id=thread_id)
+        response_text = messages.data[0].content[0].text.value
+
+        return jsonify({"response": response_text})
 
     except Exception as e:
-        print("🔥 Error:", str(e))
-        return f"Error: {str(e)}"
+        return jsonify({"error": str(e)}), 500
 
-# Endpoint to serve the chatbot UI
-@app.route("/")
-def serve_index():
-    return send_from_directory('.', 'chatbot.html')
-
-# Endpoint to handle messages from the frontend
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.json
-    user_message = data.get("message", "")
-    chatbot_response = get_chatbot_response(user_message)
-    return jsonify({"response": chatbot_response})
-
-# Initial test and start Flask app
 if __name__ == "__main__":
-    print("🔍 Testing GPT Assistant...")
-    test_response = get_chatbot_response("What languages do you teach?")
-    print("✅ Assistant test response:", test_response)
-
-    print("🚀 Starting Flask server...")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
