@@ -113,16 +113,17 @@
   <div class="chat-container">
     <h1>Chat with Beibei Amigos 💬</h1>
 
-    <!-- 📹 Welcome Video (formatted correctly) -->
-    <div style="margin-bottom: 15px;">
+    <!-- 📹 Welcome Video (autoplay, muted, no related videos) -->
+    <div style="margin-bottom: 5px;">
       <iframe width="100%" height="200" style="border-radius: 15px;"
-        src="https://www.youtube.com/embed/1okvbgdKg84"
+        src="https://www.youtube.com/embed/1okvbgdKg84?autoplay=1&mute=1&rel=0"
         title="Welcome to Beibei Amigos"
         frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allow="autoplay; encrypted-media"
         allowfullscreen>
       </iframe>
     </div>
+    <p style="font-size: 0.85em; color: #555;">🔇 Video is muted — click the video to hear audio.</p>
 
     <!-- 💬 Chat History -->
     <div class="chat-box" id="chat-box"></div>
