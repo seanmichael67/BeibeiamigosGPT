@@ -151,6 +151,43 @@
       chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${userMessage}</div>`;
       inputField.value = "";
 
+      // Hybrid logic
+      const msgLower = userMessage.toLowerCase();
+
+      if (msgLower.includes("schedule a tour")) {
+        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> You can schedule a tour here: <a href="https://beibeiamigos.com/schedule" target="_blank">Schedule a Tour</a></div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return;
+      }
+
+      if (msgLower.includes("difference between montessori and traditional")) {
+        chatBox.innerHTML += `
+          <div class="chat-message bot-message"><strong>Assistant:</strong>
+            <strong>Montessori vs. Traditional Preschool: What’s the Difference?</strong><br><br>
+            Our Montessori classrooms follow the Montessori curriculum, which includes cultural studies that teach Mandarin and Spanish language and culture. Learning is child-led with hands-on materials and mixed-age groups, encouraging independence and curiosity.<br><br>
+            Our traditional classrooms use the Beibei Amigos play-based multicultural curriculum, integrating Mandarin and Spanish through games, songs, and hands-on activities.<br><br>
+            Both programs follow the Arizona Early Learning Standards to support your child’s development through meaningful, play-based learning.<br><br>
+            Want help deciding which is best for your child? Just ask! 😊
+          </div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return;
+      }
+
+      if (msgLower.includes("tuition")) {
+        chatBox.innerHTML += `
+          <div class="chat-message bot-message"><strong>Assistant:</strong> Please select one of the following schedule options:</div>
+          <div class="chat-message bot-message">
+            <button onclick="showTuition('3 full')">3 full days</button>
+            <button onclick="showTuition('3 half')">3 half days</button><br>
+            <button onclick="showTuition('4 full')">4 full days</button>
+            <button onclick="showTuition('4 half')">4 half days</button><br>
+            <button onclick="showTuition('5 full')">5 full days</button>
+            <button onclick="showTuition('5 half')">5 half days</button>
+          </div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return;
+      }
+
       try {
         const response = await fetch("/chat", {
           method: "POST",
@@ -166,50 +203,8 @@
     }
 
     function sendPrompt(message) {
-      const chatBox = document.getElementById("chat-box");
       const inputField = document.getElementById("user-input");
       inputField.value = message;
-
-      if (message === "How do I schedule a tour?") {
-        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
-        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> You can schedule a tour here: <a href="https://beibeiamigos.com/schedule" target="_blank">Schedule a Tour</a></div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        inputField.value = "";
-        return;
-      }
-
-      if (message === "What is the tuition?") {
-        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
-        chatBox.innerHTML += `
-          <div class="chat-message bot-message"><strong>Assistant:</strong> Please select one of the following schedule options:</div>
-          <div class="chat-message bot-message">
-            <button onclick="showTuition('3 full')">3 full days</button>
-            <button onclick="showTuition('3 half')">3 half days</button><br>
-            <button onclick="showTuition('4 full')">4 full days</button>
-            <button onclick="showTuition('4 half')">4 half days</button><br>
-            <button onclick="showTuition('5 full')">5 full days</button>
-            <button onclick="showTuition('5 half')">5 half days</button>
-          </div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        inputField.value = "";
-        return;
-      }
-
-      if (message === "What is the difference between Montessori and Traditional Programs?") {
-        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
-        chatBox.innerHTML += `
-          <div class="chat-message bot-message"><strong>Assistant:</strong>
-            Montessori vs. Traditional Preschool: What’s the Difference?<br><br>
-            Our Montessori classrooms follow the Montessori curriculum, which includes cultural studies that teach Mandarin and Spanish language and culture. Learning is child-led with hands-on materials and mixed-age groups, encouraging independence and curiosity.<br><br>
-            Our traditional classrooms use the Beibei Amigos play-based multicultural curriculum, integrating Mandarin and Spanish through games, songs, and hands-on activities.<br><br>
-            Both programs follow the Arizona Early Learning Standards to support your child’s development through meaningful, play-based learning.<br><br>
-            Want help deciding which is best for your child? Just ask! 😊
-          </div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        inputField.value = "";
-        return;
-      }
-
       sendMessage();
     }
 
@@ -227,16 +222,4 @@
       }
 
       chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${option} days</div>`;
-      chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> The tuition for ${option} days is ${estimate}.</div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    document.getElementById("user-input").addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        sendMessage();
-      }
-    });
-  </script>
-</body>
-</html>
+      chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> The tuition for ${option} days
