@@ -21,7 +21,7 @@
       background-color: #d0f0ffdd;
       border-radius: 20px;
       padding: 20px;
-      padding-top: 60px; /* Increased from 30px to 60px */
+      padding-top: 60px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.1);
       text-align: center;
     }
@@ -112,7 +112,7 @@
   <div class="chat-container">
     <h1>Chat with Beibei Amigos 💬</h1>
 
-    <!-- 🎥 Reels-style video from WordPress -->
+    <!-- 🎥 Reels-style video -->
     <video
       autoplay
       muted
@@ -134,7 +134,6 @@
       <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
       <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">What is the difference between Montessori and Traditional Programs?</button>
     </div>
-<!-- Added Montessori vs Traditional button -->
 
     <div class="input-row">
       <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
@@ -173,7 +172,7 @@
 
       if (message === "How do I schedule a tour?") {
         chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
-        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> You can schedule a tour here: <a href="https://beibeiamigos.com/schedule" target="_blank">https://beibeiamigos.com/schedule</a></div>`;
+        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> You can schedule a tour here: <a href="https://beibeiamigos.com/schedule" target="_blank">Schedule a Tour</a></div>`;
         chatBox.scrollTop = chatBox.scrollHeight;
         inputField.value = "";
         return;
@@ -190,6 +189,21 @@
             <button onclick="showTuition('4 half')">4 half days</button><br>
             <button onclick="showTuition('5 full')">5 full days</button>
             <button onclick="showTuition('5 half')">5 half days</button>
+          </div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        inputField.value = "";
+        return;
+      }
+
+      if (message === "What is the difference between Montessori and Traditional Programs?") {
+        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
+        chatBox.innerHTML += `
+          <div class="chat-message bot-message"><strong>Assistant:</strong>
+            Montessori vs. Traditional Preschool: What’s the Difference?<br><br>
+            Our Montessori classrooms follow the Montessori curriculum, which includes cultural studies that teach Mandarin and Spanish language and culture. Learning is child-led with hands-on materials and mixed-age groups, encouraging independence and curiosity.<br><br>
+            Our traditional classrooms use the Beibei Amigos play-based multicultural curriculum, integrating Mandarin and Spanish through games, songs, and hands-on activities.<br><br>
+            Both programs follow the Arizona Early Learning Standards to support your child’s development through meaningful, play-based learning.<br><br>
+            Want help deciding which is best for your child? Just ask! 😊
           </div>`;
         chatBox.scrollTop = chatBox.scrollHeight;
         inputField.value = "";
