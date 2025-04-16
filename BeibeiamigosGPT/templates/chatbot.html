@@ -21,12 +21,11 @@
       background-color: #d0f0ffdd;
       border-radius: 20px;
       padding: 20px;
-      padding-top: 40px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.1);
       text-align: center;
     }
     h1 {
-      font-size: 1.5em;
+      font-size: 1.6em;
       color: #2a5d9f;
       margin-bottom: 10px;
     }
@@ -67,4 +66,115 @@
       gap: 10px;
     }
     input {
-      flex
+      flex: 1;
+      padding: 10px;
+      border-radius: 15px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 15px;
+      background-color: #2a5d9f;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #1c4479;
+    }
+    #suggested-prompts {
+      margin-bottom: 15px;
+    }
+    #suggested-prompts p {
+      font-size: 0.95em;
+      margin-bottom: 8px;
+      color: #444;
+    }
+    #suggested-prompts button {
+      background-color: #d4f4dd;
+      color: #2a5d9f;
+      border: none;
+      margin: 5px 4px;
+      padding: 8px 14px;
+      border-radius: 18px;
+      font-size: 0.85em;
+      cursor: pointer;
+    }
+    #suggested-prompts button:hover {
+      background-color: #c2eecb;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h1>Chat with Beibei Amigos 💬</h1>
+
+    <!-- 🎥 Reels-style video -->
+    <video autoplay muted loop playsinline
+      style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 20px auto 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
+      <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <p style="font-size: 0.85em; color: #555;">🔇 Video is muted — click the video to hear audio.</p>
+
+    <!-- Try Asking Buttons -->
+    <div id="suggested-prompts">
+      <p>💬 Try asking:</p>
+      <button onclick="sendPrompt('What is the tuition?')">What is the tuition?</button>
+      <button onclick="sendPrompt('How do I schedule a tour?')">How do I schedule a tour?</button>
+      <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
+      <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">Montessori vs Traditional?</button>
+      <button onclick="window.location.href='tel:6027966081'">📞 Call the School</button>
+    </div>
+
+    <!-- Chat box -->
+    <div class="chat-box" id="chat-box"></div>
+
+    <!-- Input field -->
+    <div class="input-row">
+      <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const inputField = document.getElementById("user-input");
+      const chatBox = document.getElementById("chat-box");
+      const userMessage = inputField.value.trim();
+      if (!userMessage) return;
+
+      chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${userMessage}</div>`;
+      inputField.value = "";
+
+      try {
+        const response = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage })
+        });
+        const result = await response.json();
+        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> ${result.response}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (error) {
+        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Error:</strong> Unable to reach the chatbot API.</div>`;
+      }
+    }
+
+    function sendPrompt(message) {
+      document.getElementById("user-input").value = message;
+      sendMessage();
+    }
+
+    document.getElementById("user-input").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
