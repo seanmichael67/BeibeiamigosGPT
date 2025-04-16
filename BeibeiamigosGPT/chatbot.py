@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, session, render_template
+from flask_cors import CORS
 from dotenv import load_dotenv
 import openai
 import os
@@ -11,6 +12,9 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
+
+# Enable CORS for specific origin (your WordPress site)
+CORS(app, origins=["https://www.beibeiamigos.com"])
 
 # Assistant ID from OpenAI platform
 beibei_assistant_id = "asst_vCKTsoryISAi0vnXRzlTRg7r"
