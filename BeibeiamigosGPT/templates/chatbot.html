@@ -112,23 +112,16 @@
   <div class="chat-container">
     <h1>Chat with Beibei Amigos 💬</h1>
 
-    <video autoplay muted loop playsinline style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 60px auto 20px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
-      <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-
-    <p style="font-size: 0.85em; color: #555;">🔇 Video is muted — click the video to hear audio.</p>
-
-    <div class="chat-box" id="chat-box"></div>
-
     <div id="suggested-prompts">
       <p>💬 Try asking:</p>
       <button onclick="sendPrompt('What is the tuition?')">What is the tuition?</button>
       <button onclick="sendPrompt('How do I schedule a tour?')">How do I schedule a tour?</button>
       <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
       <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">What is the difference between Montessori and Traditional Programs?</button>
-      <button onclick="callSchool()">📞 Call the School</button>
+      <button onclick="sendPrompt('Can I call the school?')">Can I call the school?</button>
     </div>
+
+    <div class="chat-box" id="chat-box"></div>
 
     <div class="input-row">
       <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
@@ -146,11 +139,6 @@
       chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${userMessage}</div>`;
       inputField.value = "";
 
-      // Simple log check
-      if (userMessage.toLowerCase().includes("tour")) {
-        console.log("Tour inquiry detected: " + userMessage);
-      }
-
       try {
         const response = await fetch("/chat", {
           method: "POST",
@@ -166,12 +154,27 @@
     }
 
     function sendPrompt(message) {
-      document.getElementById("user-input").value = message;
-      sendMessage();
-    }
+      const chatBox = document.getElementById("chat-box");
+      const inputField = document.getElementById("user-input");
+      inputField.value = message;
 
-    function callSchool() {
-      window.location.href = "tel:+16027966081"; // Phone number for Beibei Amigos
+      if (message === "How do I schedule a tour?") {
+        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
+        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> You can schedule a tour here: <a href="https://beibeiamigos.com/schedule" target="_blank">https://beibeiamigos.com/schedule</a></div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        inputField.value = "";
+        return;
+      }
+
+      if (message === "Can I call the school?") {
+        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
+        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> Sure! You can call us at <a href="tel:6027966081">(602) 796-6081</a></div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        inputField.value = "";
+        return;
+      }
+
+      sendMessage();
     }
 
     document.getElementById("user-input").addEventListener("keydown", function(event) {
