@@ -25,7 +25,7 @@
       text-align: center;
     }
     h1 {
-      font-size: 1.6em;
+      font-size: 1.5em;
       color: #2a5d9f;
       margin-bottom: 10px;
     }
@@ -35,7 +35,7 @@
       border-radius: 10px;
       background-color: #f7f7f7;
       padding: 10px;
-      margin-top: 10px;
+      margin-bottom: 10px;
       text-align: left;
     }
     .chat-message {
@@ -64,7 +64,6 @@
     .input-row {
       display: flex;
       gap: 10px;
-      margin-top: 10px;
     }
     input {
       flex: 1;
@@ -86,7 +85,7 @@
       background-color: #1c4479;
     }
     #suggested-prompts {
-      margin-bottom: 15px;
+      margin: 15px 0;
     }
     #suggested-prompts p {
       font-size: 0.95em;
@@ -112,33 +111,34 @@
   <div class="chat-container">
     <h1>Chat with Beibei Amigos 💬</h1>
 
-    <!-- 🎥 Reels-style video -->
-    <video autoplay muted loop playsinline
-      style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 20px auto 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
+    <!-- 🎥 Reels-style video from WordPress -->
+    <video
+      autoplay
+      muted
+      loop
+      playsinline
+      style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 10px auto 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
       <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
 
     <p style="font-size: 0.85em; color: #555;">🔇 Video is muted — click the video to hear audio.</p>
 
-    <!-- Suggested questions -->
     <div id="suggested-prompts">
       <p>💬 Try asking:</p>
       <button onclick="sendPrompt('What is the tuition?')">What is the tuition?</button>
-      <button onclick="sendPrompt('How do I schedule a tour?')">How do I schedule a tour?</button>
+      <button onclick="window.open('https://beibeiamigos.com/schedule', '_blank')">📅 Book a Tour</button>
       <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
       <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">Montessori vs Traditional?</button>
       <button onclick="window.location.href='tel:6027966081'">📞 Call the School</button>
     </div>
 
-    <!-- Input field now ABOVE the chat box -->
+    <div class="chat-box" id="chat-box"></div>
+
     <div class="input-row">
       <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
       <button onclick="sendMessage()">Send</button>
     </div>
-
-    <!-- Chat box now BELOW the input -->
-    <div class="chat-box" id="chat-box"></div>
   </div>
 
   <script>
@@ -166,7 +166,8 @@
     }
 
     function sendPrompt(message) {
-      document.getElementById("user-input").value = message;
+      const inputField = document.getElementById("user-input");
+      inputField.value = message;
       sendMessage();
     }
 
