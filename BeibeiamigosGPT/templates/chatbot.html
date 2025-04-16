@@ -112,15 +112,11 @@
   <div class="chat-container">
     <h1>Chat with Beibei Amigos 💬</h1>
 
-    <video
-      autoplay
-      muted
-      loop
-      playsinline
-      style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 60px auto 20px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
+    <video autoplay muted loop playsinline style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 60px auto 20px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
       <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
+
     <p style="font-size: 0.85em; color: #555;">🔇 Video is muted — click the video to hear audio.</p>
 
     <div class="chat-box" id="chat-box"></div>
@@ -131,6 +127,7 @@
       <button onclick="sendPrompt('How do I schedule a tour?')">How do I schedule a tour?</button>
       <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
       <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">What is the difference between Montessori and Traditional Programs?</button>
+      <button onclick="callSchool()">📞 Call the School</button>
     </div>
 
     <div class="input-row">
@@ -149,6 +146,11 @@
       chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${userMessage}</div>`;
       inputField.value = "";
 
+      // Simple log check
+      if (userMessage.toLowerCase().includes("tour")) {
+        console.log("Tour inquiry detected: " + userMessage);
+      }
+
       try {
         const response = await fetch("/chat", {
           method: "POST",
@@ -164,62 +166,12 @@
     }
 
     function sendPrompt(message) {
-      const chatBox = document.getElementById("chat-box");
-      const inputField = document.getElementById("user-input");
-      inputField.value = message;
-
-      if (message === "How do I schedule a tour?") {
-        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
-        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> You can schedule a tour here: <a href="https://beibeiamigos.com/schedule" target="_blank">https://beibeiamigos.com/schedule</a></div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        inputField.value = "";
-        return;
-      }
-
-      if (message === "What is the tuition?") {
-        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
-        chatBox.innerHTML += `
-          <div class="chat-message bot-message"><strong>Assistant:</strong> Please select one of the following schedule options:</div>
-          <div class="chat-message bot-message">
-            <button onclick="showTuition('3 full')">3 full days</button>
-            <button onclick="showTuition('3 half')">3 half days</button><br>
-            <button onclick="showTuition('4 full')">4 full days</button>
-            <button onclick="showTuition('4 half')">4 half days</button><br>
-            <button onclick="showTuition('5 full')">5 full days</button>
-            <button onclick="showTuition('5 half')">5 half days</button>
-          </div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        inputField.value = "";
-        return;
-      }
-
-      if (message === "What is the difference between Montessori and Traditional Programs?") {
-        chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${message}</div>`;
-        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> Montessori vs. Traditional Preschool: What’s the Difference?<br><br>Our Montessori classrooms follow the Montessori curriculum, which includes cultural studies that teach Mandarin and Spanish language and culture. Learning is child-led with hands-on materials and mixed-age groups, encouraging independence and curiosity.<br><br>Our traditional classrooms use the Beibei Amigos play-based multicultural curriculum, integrating Mandarin and Spanish through games, songs, and hands-on activities.<br><br>Both programs follow the Arizona Early Learning Standards to support your child’s development through meaningful, play-based learning.<br><br>Want help deciding which is best for your child? Just ask! 😊</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-        inputField.value = "";
-        return;
-      }
-
-      sendMessage(); // Fallback for freeform or unrecognized prompts
+      document.getElementById("user-input").value = message;
+      sendMessage();
     }
 
-    function showTuition(option) {
-      const chatBox = document.getElementById("chat-box");
-      let estimate = "";
-
-      switch (option) {
-        case "3 full": estimate = "$720 per month"; break;
-        case "3 half": estimate = "$540 per month"; break;
-        case "4 full": estimate = "$880 per month"; break;
-        case "4 half": estimate = "$640 per month"; break;
-        case "5 full": estimate = "$1050 per month"; break;
-        case "5 half": estimate = "$750 per month"; break;
-      }
-
-      chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${option} days</div>`;
-      chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> The tuition for ${option} days is ${estimate}.</div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
+    function callSchool() {
+      window.location.href = "tel:+16027966081"; // Phone number for Beibei Amigos
     }
 
     document.getElementById("user-input").addEventListener("keydown", function(event) {
