@@ -26,44 +26,42 @@ def chat():
         return jsonify({"error": "No message provided"}), 400
 
     try:
-        user_id = request.remote_addr  # Use IP address for trace
-
-        # Create or reuse a thread
+        # Create or reuse a thread for this session
         if 'thread_id' not in session:
             thread = openai.beta.threads.create()
             session['thread_id'] = thread.id
         thread_id = session['thread_id']
 
-        # Post message
+        # Post the user's message to the thread
         openai.beta.threads.messages.create(
             thread_id=thread_id,
             role="user",
             content=user_input
         )
 
-        # Run assistant
+        # Run the assistant
         run = openai.beta.threads.runs.create(
             thread_id=thread_id,
-            assistant_id=beibei_assistant_id,
-            user_id=user_id,
-            metadata={"source": "beibeiamigosgpt-web"}
+            assistant_id=beibei_assistant_id
         )
 
-        # Poll until complete
+        # Poll until the run is completed
         while True:
-            status = openai.beta.threads.runs.retrieve(
+            run_status = openai.beta.threads.runs.retrieve(
                 thread_id=thread_id,
                 run_id=run.id
             )
-            if status.status == "completed":
+            if run_status.status == "completed":
                 break
-            elif status.status == "failed":
+            elif run_status.status == "failed":
                 return jsonify({"error": "Assistant run failed"}), 500
             time.sleep(1)
 
+        # Retrieve the assistant's response
         messages = openai.beta.threads.messages.list(thread_id=thread_id)
-        reply = messages.data[0].content[0].text.value
-        return jsonify({"response": reply})
+        response_text = messages.data[0].content[0].text.value
+
+        return jsonify({"response": response_text})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
