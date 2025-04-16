@@ -4,9 +4,6 @@ import openai
 import os
 import time
 
-# Tracing support from OpenAI Agents SDK
-from openai.tracing import with_tracing
-
 # Load environment variables
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -23,7 +20,6 @@ def home():
     return render_template("chatbot.html")
 
 @app.route("/chat", methods=["POST"])
-@with_tracing(name="chat_endpoint")  # ✅ Enable tracing for this route
 def chat():
     user_input = request.json.get("message")
     if not user_input:
@@ -36,20 +32,20 @@ def chat():
             session['thread_id'] = thread.id
         thread_id = session['thread_id']
 
-        # Post the user's message to the assistant
+        # Post the user's message
         openai.beta.threads.messages.create(
             thread_id=thread_id,
             role="user",
             content=user_input
         )
 
-        # Start a run
+        # Run the assistant
         run = openai.beta.threads.runs.create(
             thread_id=thread_id,
             assistant_id=beibei_assistant_id
         )
 
-        # Wait for completion
+        # Poll for completion
         while True:
             run_status = openai.beta.threads.runs.retrieve(
                 thread_id=thread_id,
@@ -61,14 +57,4 @@ def chat():
                 return jsonify({"error": "Assistant run failed"}), 500
             time.sleep(1)
 
-        # Get latest response
-        messages = openai.beta.threads.messages.list(thread_id=thread_id)
-        response_text = messages.data[0].content[0].text.value
-
-        return jsonify({"response": response_text})
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-if __name__ == "__main__":
-    app.run(debug=True)
+        #
