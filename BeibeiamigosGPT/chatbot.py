@@ -12,8 +12,8 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
 
-# Your Assistant ID from OpenAI platform
-tutti_assistant_id = "asst_vCKTsoryISAi0vnXRzlTRg7r"
+# Assistant ID from OpenAI platform
+beibei_assistant_id = "asst_vCKTsoryISAi0vnXRzlTRg7r"
 
 @app.route("/")
 def home():
@@ -26,33 +26,31 @@ def chat():
         return jsonify({"error": "No message provided"}), 400
 
     try:
-        # Use client IP as user_id
+        # Use client IP address as unique user_id
         user_id = request.remote_addr
 
-        # Create or reuse a thread for the user
+        # Create or reuse a thread for this session
         if 'thread_id' not in session:
             thread = openai.beta.threads.create()
             session['thread_id'] = thread.id
         thread_id = session['thread_id']
 
-        # Send user message to thread
+        # Post the user's message to the thread
         openai.beta.threads.messages.create(
             thread_id=thread_id,
             role="user",
             content=user_input
         )
 
-        # Run assistant with trace info
+        # Run the assistant with tracing info
         run = openai.beta.threads.runs.create(
             thread_id=thread_id,
-            assistant_id=tutti_assistant_id,
-            user_id=user_id,  # <-- IP address
-            metadata={
-                "source": "beibeiamigosgpt-web"
-            }
+            assistant_id=beibei_assistant_id,
+            user_id=user_id,
+            metadata={"source": "beibeiamigosgpt-web"}
         )
 
-        # Poll until completion
+        # Poll until the run is completed
         while True:
             run_status = openai.beta.threads.runs.retrieve(
                 thread_id=thread_id,
@@ -64,7 +62,7 @@ def chat():
                 return jsonify({"error": "Assistant run failed"}), 500
             time.sleep(1)
 
-        # Get assistant's reply
+        # Retrieve the assistant's response
         messages = openai.beta.threads.messages.list(thread_id=thread_id)
         response_text = messages.data[0].content[0].text.value
 
