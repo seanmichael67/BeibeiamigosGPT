@@ -35,7 +35,7 @@
       border-radius: 10px;
       background-color: #f7f7f7;
       padding: 10px;
-      margin-bottom: 10px;
+      margin-top: 10px;
       text-align: left;
     }
     .chat-message {
@@ -64,6 +64,7 @@
     .input-row {
       display: flex;
       gap: 10px;
+      margin-top: 10px;
     }
     input {
       flex: 1;
@@ -120,7 +121,7 @@
 
     <p style="font-size: 0.85em; color: #555;">🔇 Video is muted — click the video to hear audio.</p>
 
-    <!-- Try Asking Buttons -->
+    <!-- Suggested questions -->
     <div id="suggested-prompts">
       <p>💬 Try asking:</p>
       <button onclick="sendPrompt('What is the tuition?')">What is the tuition?</button>
@@ -130,14 +131,14 @@
       <button onclick="window.location.href='tel:6027966081'">📞 Call the School</button>
     </div>
 
-    <!-- Chat box -->
-    <div class="chat-box" id="chat-box"></div>
-
-    <!-- Input field -->
+    <!-- Input field now ABOVE the chat box -->
     <div class="input-row">
       <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
       <button onclick="sendMessage()">Send</button>
     </div>
+
+    <!-- Chat box now BELOW the input -->
+    <div class="chat-box" id="chat-box"></div>
   </div>
 
   <script>
