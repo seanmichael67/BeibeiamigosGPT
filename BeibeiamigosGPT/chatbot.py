@@ -4,6 +4,9 @@ import openai
 import os
 import time
 
+# Tracing
+from openai.tracing import with_tracing
+
 # Load environment variables
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -20,6 +23,7 @@ def home():
     return render_template("chatbot.html")
 
 @app.route("/chat", methods=["POST"])
+@with_tracing(name="chat_endpoint")  # <-- Tracing added here
 def chat():
     user_input = request.json.get("message")
     if not user_input:
@@ -32,7 +36,7 @@ def chat():
             session['thread_id'] = thread.id
         thread_id = session['thread_id']
 
-        # Post the user's message to the thread
+        # Post the user's message
         openai.beta.threads.messages.create(
             thread_id=thread_id,
             role="user",
@@ -45,7 +49,7 @@ def chat():
             assistant_id=beibei_assistant_id
         )
 
-        # Poll until the run is completed
+        # Poll for completion
         while True:
             run_status = openai.beta.threads.runs.retrieve(
                 thread_id=thread_id,
@@ -57,7 +61,7 @@ def chat():
                 return jsonify({"error": "Assistant run failed"}), 500
             time.sleep(1)
 
-        # Retrieve the assistant's response
+        # Get the response
         messages = openai.beta.threads.messages.list(thread_id=thread_id)
         response_text = messages.data[0].content[0].text.value
 
