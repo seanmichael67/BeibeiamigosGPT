@@ -32,10 +32,10 @@
             let chatBox = document.getElementById("chat-box");
             chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${userMessage}</div>`;
 
-            document.getElementById("user-input").value = "";  // Clear input field
+            document.getElementById("user-input").value = "";
 
             try {
-                let response = await fetch("http://127.0.0.1:5000/chat", {
+                let response = await fetch("https://beibeiamigosgpt.onrender.com/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: userMessage })
@@ -43,7 +43,7 @@
 
                 let result = await response.json();
                 chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> ${result.response}</div>`;
-                chatBox.scrollTop = chatBox.scrollHeight;  // Auto-scroll to the latest message
+                chatBox.scrollTop = chatBox.scrollHeight;
             } catch (error) {
                 chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Error:</strong> Unable to reach the chatbot API.</div>`;
             }
