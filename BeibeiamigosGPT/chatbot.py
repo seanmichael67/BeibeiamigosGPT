@@ -20,4 +20,5 @@ ASSISTANT_ID = os.getenv("OPENAI_ASSISTANT_ID")
 
 # Flask app setup
 app = Flask(__name__)
-CORS(a
+CORS(app)
+
