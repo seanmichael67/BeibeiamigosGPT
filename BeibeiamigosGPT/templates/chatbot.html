@@ -105,19 +105,27 @@
     #suggested-prompts button:hover {
       background-color: #c2eecb;
     }
+    #tuition-guided button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 0.9em;
+      background-color: #f0fff0;
+      color: #2a5d9f;
+      border: 1px solid #cce;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+    #tuition-guided button:hover {
+      background-color: #e6f7e6;
+    }
   </style>
 </head>
 <body>
   <div class="chat-container">
     <h1>Chat with Beibei Amigos 💬</h1>
 
-    <!-- 🎥 Reels-style video from WordPress -->
-    <video
-      autoplay
-      muted
-      loop
-      playsinline
-      style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 10px auto 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
+    <video autoplay muted loop playsinline
+      style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
       <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
@@ -139,6 +147,17 @@
       <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
       <button onclick="sendMessage()">Send</button>
     </div>
+
+    <div id="tuition-guided" style="margin-top: 15px;">
+      <p style="font-weight: bold;">👶 Select your child's age:</p>
+      <div id="age-buttons">
+        <button onclick="selectAge(1)">1 Year Old</button>
+        <button onclick="selectAge(2)">2 Years Old</button>
+        <button onclick="selectAge(3)">3 Years Old</button>
+        <button onclick="selectAge(4)">4 Years Old</button>
+        <button onclick="selectAge(5)">5 Years Old</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -150,6 +169,25 @@
 
       chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${userMessage}</div>`;
       inputField.value = "";
+
+      const lowerMsg = userMessage.toLowerCase();
+
+      if (lowerMsg.includes("tuition") || lowerMsg.includes("how much") || lowerMsg.includes("cost")) {
+        const tuitionResponse = `
+          <strong>Assistant:</strong> Here’s a breakdown of our tuition rates:<br><br>
+          <ul style="padding-left: 20px;">
+            <li><strong>1 day per week:</strong> $63/day</li>
+            <li><strong>2 days per week:</strong> $504/month</li>
+            <li><strong>3 half-days (17 months):</strong> $609/month</li>
+            <li><strong>3 full days (1-year-old):</strong> $750/month</li>
+            <li><strong>5 full days (2-year-old):</strong> $1,025/month</li>
+          </ul>
+          <br>📌 Extended care and other options available. Use the buttons below for a custom quote.
+        `;
+        chatBox.innerHTML += `<div class="chat-message bot-message">${tuitionResponse}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return;
+      }
 
       try {
         const response = await fetch("/chat", {
@@ -177,6 +215,59 @@
         sendMessage();
       }
     });
+
+    // Tuition button logic
+    let selectedAge = null;
+    let selectedDayType = null;
+    let selectedDays = null;
+
+    function selectAge(age) {
+      selectedAge = age;
+      document.getElementById("tuition-guided").innerHTML = `
+        <p><strong>☀️ Age Selected:</strong> ${age} Year Old</p>
+        <p><strong>Choose Half Day or Full Day:</strong></p>
+        <div>
+          <button onclick="selectDayType('half')">Half Day</button>
+          <button onclick="selectDayType('full')">Full Day</button>
+        </div>
+      `;
+    }
+
+    function selectDayType(type) {
+      selectedDayType = type;
+      document.getElementById("tuition-guided").innerHTML += `
+        <p><strong>How many days per week?</strong></p>
+        <div>
+          <button onclick="selectDays(3)">3 Days</button>
+          <button onclick="selectDays(4)">4 Days</button>
+          <button onclick="selectDays(5)">5 Days</button>
+        </div>
+      `;
+    }
+
+    function selectDays(days) {
+      selectedDays = days;
+      const tuitionTable = {
+        1: { half: { 3: 450, 4: 580, 5: 700 }, full: { 3: 750, 4: 950, 5: 1100 } },
+        2: { half: { 3: 480, 4: 620, 5: 740 }, full: { 3: 800, 4: 990, 5: 1200 } },
+        3: { half: { 3: 500, 4: 650, 5: 770 }, full: { 3: 850, 4: 1020, 5: 1250 } },
+        4: { half: { 3: 520, 4: 670, 5: 800 }, full: { 3: 870, 4: 1050, 5: 1300 } },
+        5: { half: { 3: 540, 4: 700, 5: 830 }, full: { 3: 900, 4: 1100, 5: 1350 } }
+      };
+
+      const tuition = tuitionTable[selectedAge]?.[selectedDayType]?.[selectedDays];
+      const chatBox = document.getElementById("chat-box");
+
+      const result = tuition
+        ? `🎓 For a ${selectedAge}-year-old attending ${selectedDays} ${selectedDayType === 'full' ? 'full' : 'half'} days per week, the monthly tuition is <strong>$${tuition}</strong>.`
+        : "Sorry, we don’t have tuition data for this combination.";
+
+      chatBox.innerHTML += `
+        <div class="chat-message bot-message"><strong>Assistant:</strong> ${result}</div>
+      `;
+      chatBox.scrollTop = chatBox.scrollHeight;
+      document.getElementById("tuition-guided").style.display = "none";
+    }
   </script>
 </body>
 </html>
