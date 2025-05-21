@@ -110,7 +110,7 @@
 <body>
  <div class="chat-container">
    <h1>Chat with Beibei Amigos 💬</h1>
-   <video autoplay loop playsinline style="width: 100%; max-width: 360px; height: auto; border-radius: 20px; display: block; margin: 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
+   <video id="introVideo" autoplay loop muted playsinline style="width: 100%; max-width: 360px; height: auto; border-radius: 20px; display: block; margin: 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
      <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
      Your browser does not support the video tag.
    </video>
@@ -121,7 +121,7 @@
      <button onclick="window.open('https://beibeiamigos.com/schedule', '_blank')">🗓️ Book a Tour</button>
      <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
      <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">Montessori vs Traditional?</button>
-     <button onclick="window.location.href='tel:6029964990'">📞 Call the School</button>
+     <a href="tel:6029964990" style="text-decoration: none;"><button>📞 Call the School</button></a>
    </div>
    <div class="chat-box" id="chat-box"></div>
    <div class="input-row">
@@ -200,7 +200,11 @@
        headers: { "Content-Type": "application/json" },
        body: JSON.stringify({ message: userMessage })
      }).then(res => res.json()).then(result => {
-       chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> ${result.response}</div>`;
+       let botResponse = result.response;
+if (botResponse.toLowerCase().includes("do you want to book a tour")) {
+  botResponse += '<br><a href="https://beibeiamigos.com/schedule" target="_blank"><button class="chat-button">🗓️ Book a Tour</button></a>';
+}
+chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> ${botResponse}</div>`;
        chatBox.scrollTop = chatBox.scrollHeight;
      }).catch(() => {
        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Error:</strong> Unable to reach the chatbot API.</div>`;
@@ -241,13 +245,23 @@
    }
 
    function addBotMessage(message) {
-     const chatBox = document.getElementById("chat-box");
-     chatBox.innerHTML += `<div class='chat-message bot-message'>${message}</div>`;
+  const chatBox = document.getElementById("chat-box");
+  const messageNode = document.createElement('div');
+  messageNode.className = 'chat-message bot-message';
+  messageNode.innerHTML = message;
+  chatBox.appendChild(messageNode);
+  setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+}</div>`;
      chatBox.scrollTop = chatBox.scrollHeight;
    }
    function addOptions(options, callback) {
-     const chatBox = document.getElementById("chat-box");
-     let buttons = options.map(opt => `<button class='chat-button' onclick='${callback.name}("${opt}")'>${opt}</button>`).join('');
+  const chatBox = document.getElementById("chat-box");
+  const buttonWrapper = document.createElement('div');
+  buttonWrapper.className = 'chat-message bot-message';
+  buttonWrapper.innerHTML = options.map(opt => `<button class='chat-button' onclick='${callback.name}("${opt}")'>${opt}</button>`).join('');
+  chatBox.appendChild(buttonWrapper);
+  setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+}("${opt}")'>${opt}</button>`).join('');
      chatBox.innerHTML += `<div class='chat-message bot-message'>${buttons}</div>`;
      chatBox.scrollTop = chatBox.scrollHeight;
    }
@@ -257,6 +271,22 @@
        sendMessage();
      }
    });
- </script>
+   // Add mute/unmute toggle
+  const video = document.getElementById('introVideo');
+  const toggleButton = document.createElement('button');
+  toggleButton.textContent = '🔈 Unmute';
+  toggleButton.style.margin = '10px auto';
+  toggleButton.style.display = 'block';
+  toggleButton.style.background = '#ffd6e0';
+  toggleButton.style.border = 'none';
+  toggleButton.style.borderRadius = '10px';
+  toggleButton.style.padding = '8px 12px';
+  toggleButton.style.cursor = 'pointer';
+  toggleButton.onclick = function () {
+    video.muted = !video.muted;
+    toggleButton.textContent = video.muted ? '🔇 Mute' : '🔈 Unmute';
+  };
+  video.insertAdjacentElement('afterend', toggleButton);
+</script>
 </body>
 </html>
