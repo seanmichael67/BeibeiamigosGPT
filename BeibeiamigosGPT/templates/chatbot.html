@@ -110,77 +110,147 @@
 <body>
  <div class="chat-container">
    <h1>Chat with Beibei Amigos 💬</h1>
-
-
-   <!-- 🎥 Reels-style video from WordPress -->
-   <video
-     autoplay
-     muted
-     loop
-     playsinline
-     style="width: 100%; max-width: 360px; border-radius: 20px; display: block; margin: 10px auto 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
+   <video autoplay loop playsinline>
      <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
      Your browser does not support the video tag.
    </video>
-
-
-   <p style="font-size: 0.85em; color: #555;">🔇 Video is muted — click the video to hear audio.</p>
-
-
+   
    <div id="suggested-prompts">
      <p>💬 Try asking:</p>
-     <button onclick="sendPrompt('What is the tuition?')">What is the tuition?</button>
-     <button onclick="window.open('https://beibeiamigos.com/schedule', '_blank')">📅 Book a Tour</button>
+     <button onclick="startTuitionFlow()">What is the tuition?</button>
+     <button onclick="window.open('https://beibeiamigos.com/schedule', '_blank')">🗓️ Book a Tour</button>
      <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
      <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">Montessori vs Traditional?</button>
      <button onclick="window.location.href='tel:6029964990'">📞 Call the School</button>
    </div>
-
-
    <div class="chat-box" id="chat-box"></div>
-
-
    <div class="input-row">
      <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
      <button onclick="sendMessage()">Send</button>
    </div>
  </div>
-
-
  <script>
-   async function sendMessage() {
+   let tuitionData = { days: null, type: null, age: null, program: null };
+   const tuitionTable = {
+  "1_3_Half_Traditional": 679,
+  "1_3_Full_Traditional": 825,
+  "1_4_Half_Traditional": 809,
+  "1_4_Full_Traditional": 956,
+  "1_5_Half_Traditional": 927,
+  "1_5_Full_Traditional": 1196,
+  "2_3_Half_Traditional": 647,
+  "2_3_Full_Traditional": 803,
+  "2_4_Half_Traditional": 790,
+  "2_4_Full_Traditional": 932,
+  "2_5_Half_Traditional": 920,
+  "2_5_Full_Traditional": 1127,
+  "2_3_Half_Montessori": 700,
+  "2_3_Full_Montessori": 850,
+  "2_4_Half_Montessori": 840,
+  "2_4_Full_Montessori": 950,
+  "2_5_Half_Montessori": 1000,
+  "2_5_Full_Montessori": 1225,
+  "3_3_Half_Traditional": 594,
+  "3_3_Full_Traditional": 776,
+  "3_4_Half_Traditional": 734,
+  "3_4_Full_Traditional": 898,
+  "3_5_Half_Traditional": 809,
+  "3_5_Full_Traditional": 1047,
+  "3_3_Half_Montessori": 635,
+  "3_3_Full_Montessori": 795,
+  "3_4_Half_Montessori": 776,
+  "3_4_Full_Montessori": 912,
+  "3_5_Half_Montessori": 907,
+  "3_5_Full_Montessori": 1112,
+  "4_3_Half_Traditional": 594,
+  "4_3_Full_Traditional": 776,
+  "4_4_Half_Traditional": 734,
+  "4_4_Full_Traditional": 898,
+  "4_5_Half_Traditional": 809,
+  "4_5_Full_Traditional": 1047,
+  "4_3_Half_Montessori": 635,
+  "4_3_Full_Montessori": 795,
+  "4_4_Half_Montessori": 776,
+  "4_4_Full_Montessori": 912,
+  "4_5_Half_Montessori": 907,
+  "4_5_Full_Montessori": 1112,
+  "5_3_Half_Traditional": 594,
+  "5_3_Full_Traditional": 776,
+  "5_4_Half_Traditional": 734,
+  "5_4_Full_Traditional": 898,
+  "5_5_Half_Traditional": 809,
+  "5_5_Full_Traditional": 1047,
+  "5_3_Half_Montessori": 635,
+  "5_3_Full_Montessori": 795,
+  "5_4_Half_Montessori": 776,
+  "5_4_Full_Montessori": 912,
+  "5_5_Half_Montessori": 907,
+  "5_5_Full_Montessori": 1112
+};
+
+   function sendMessage() {
      const inputField = document.getElementById("user-input");
      const chatBox = document.getElementById("chat-box");
      const userMessage = inputField.value.trim();
      if (!userMessage) return;
-
-
      chatBox.innerHTML += `<div class="chat-message user-message"><strong>You:</strong> ${userMessage}</div>`;
      inputField.value = "";
-
-
-     try {
-       const response = await fetch("/chat", {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({ message: userMessage })
-       });
-       const result = await response.json();
+     fetch("/chat", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ message: userMessage })
+     }).then(res => res.json()).then(result => {
        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Assistant:</strong> ${result.response}</div>`;
        chatBox.scrollTop = chatBox.scrollHeight;
-     } catch (error) {
+     }).catch(() => {
        chatBox.innerHTML += `<div class="chat-message bot-message"><strong>Error:</strong> Unable to reach the chatbot API.</div>`;
-     }
+     });
    }
 
-
    function sendPrompt(message) {
-     const inputField = document.getElementById("user-input");
-     inputField.value = message;
+     document.getElementById("user-input").value = message;
      sendMessage();
    }
 
+   function startTuitionFlow() {
+     addBotMessage("How many days would you like your child to attend?");
+     addOptions(['3', '4', '5'], selectDays);
+   }
+   function selectDays(days) {
+     tuitionData.days = days;
+     addBotMessage("Would you like half days or full days?");
+     addOptions(['Half', 'Full'], selectType);
+   }
+   function selectType(type) {
+     tuitionData.type = type;
+     addBotMessage("What is your child's age?");
+     addOptions(['1', '2', '3', '4', '5'], selectAge);
+   }
+   function selectAge(age) {
+     tuitionData.age = age;
+     addBotMessage("Do you prefer the Montessori or Traditional program?");
+     addOptions(['Montessori', 'Traditional'], selectProgram);
+   }
+   function selectProgram(program) {
+     tuitionData.program = program;
+     const key = `${tuitionData.age}_${tuitionData.days}_${tuitionData.type}_${tuitionData.program}`;
+     const tuition = tuitionTable[key];
+     const message = tuition ? `Based on your selections, the monthly tuition is <strong>$${tuition}</strong>.` : `Sorry, we don’t have tuition information for that combination.`;
+     addBotMessage(message);
+     tuitionData = { days: null, type: null, age: null, program: null };
+   }
 
+   function addBotMessage(message) {
+     const chatBox = document.getElementById("chat-box");
+     chatBox.innerHTML += `<div class='chat-message bot-message'>${message}</div>`;
+     chatBox.scrollTop = chatBox.scrollHeight;
+   }
+   function addOptions(options, callback) {
+     const chatBox = document.getElementById("chat-box");
+     let buttons = options.map(opt => `<button class='chat-button' onclick='${callback.name}("${opt}")'>${opt}</button>`).join('');
+     chatBox.innerHTML += `<div class='chat-message bot-message'>${buttons}</div>`;
+     chatBox.scrollTop = chatBox.scrollHeight;
+   }
    document.getElementById("user-input").addEventListener("keydown", function(event) {
      if (event.key === "Enter") {
        event.preventDefault();
