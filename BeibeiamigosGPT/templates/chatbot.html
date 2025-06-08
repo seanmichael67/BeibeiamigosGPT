@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -91,11 +90,9 @@
     margin: 10px 0;
   }
   #suggested-prompts p {
-  font-size: 1.1em; /* increased from 0.85em */
-  font-weight: bold; /* optional, makes it stand out more */
-  margin-bottom: 8px;
-  color: #444;
-}
+    font-size: 0.85em;
+    margin-bottom: 8px;
+    color: #444;
   }
   #suggested-prompts button {
     background-color: #d4f4dd;
@@ -163,7 +160,7 @@
 
     const userMessageDiv = document.createElement('div');
     userMessageDiv.className = 'chat-message user-message';
-    userMessageDiv.innerHTML = `<strong>You:</strong> ${userMessage}`;
+    userMessageDiv.innerHTML = <strong>You:</strong> ${userMessage};
     chatBox.appendChild(userMessageDiv);
     inputField.value = "";
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -179,13 +176,13 @@
       }
       const botMessageDiv = document.createElement('div');
       botMessageDiv.className = 'chat-message bot-message';
-      botMessageDiv.innerHTML = `<strong>Assistant:</strong> ${botResponse}`;
+      botMessageDiv.innerHTML = <strong>Assistant:</strong> ${botResponse};
       chatBox.appendChild(botMessageDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     }).catch(() => {
       const errorDiv = document.createElement('div');
       errorDiv.className = 'chat-message bot-message';
-      errorDiv.innerHTML = `<strong>Error:</strong> Unable to reach the chatbot API.`;
+      errorDiv.innerHTML = <strong>Error:</strong> Unable to reach the chatbot API.;
       chatBox.appendChild(errorDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     });
@@ -211,7 +208,7 @@
     buttonWrapper.className = 'chat-message bot-message'; 
     buttonWrapper.style.backgroundColor = "transparent";
     buttonWrapper.innerHTML = options.map(opt => 
-      `<button class='chat-button' onclick='${callback.name}("${opt}")'>${opt}</button>`
+      <button class='chat-button' onclick='${callback.name}("${opt}")'>${opt}</button>
     ).join(' ');
     chatBox.appendChild(buttonWrapper);
     setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
@@ -246,9 +243,9 @@
   function selectProgram(program) {
     addUserMessageFromChoice(program + " program");
     tuitionData.program = program;
-    const key = `${tuitionData.age}_${tuitionData.days}_${tuitionData.type}_${tuitionData.program}`;
+    const key = ${tuitionData.age}_${tuitionData.days}_${tuitionData.type}_${tuitionData.program};
     const tuition = tuitionTable[key];
-    const message = tuition ? `Based on your selections, the monthly tuition is <strong>$${tuition}</strong>.` : `Sorry, we don’t have tuition information for that combination.`;
+    const message = tuition ? Based on your selections, the monthly tuition is <strong>$${tuition}</strong>. : Sorry, we don’t have tuition information for that combination.;
     addBotMessage(message);
     tuitionData = { days: null, type: null, age: null, program: null };
   }
@@ -257,7 +254,7 @@
     const chatBox = document.getElementById("chat-box");
     const userMessageDiv = document.createElement('div');
     userMessageDiv.className = 'chat-message user-message';
-    userMessageDiv.innerHTML = `<strong>You:</strong> ${choiceText}`;
+    userMessageDiv.innerHTML = <strong>You:</strong> ${choiceText};
     chatBox.appendChild(userMessageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
