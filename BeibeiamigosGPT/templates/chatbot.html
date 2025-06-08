@@ -1,353 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Beibei Amigos Assistant</title>
- <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
- <style>
-   body {
-     font-family: 'Quicksand', sans-serif;
-     margin: 0;
-     background: linear-gradient(to bottom right, #fce3ec, #d8f3dc);
-     display: flex;
-     justify-content: center;
-     align-items: center;
-     height: 100vh;
-   }
-   .chat-container {
-     width: 90%;
-     max-width: 420px;
-     background-color: #d0f0ffdd;
-     border-radius: 20px;
-     padding: 20px;
-     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-     text-align: center;
-   }
-   h1 {
-     font-size: 1.5em;
-     color: #2a5d9f;
-     margin-bottom: 10px;
-   }
-   .chat-box {
-     height: 300px;
-     overflow-y: auto;
-     border-radius: 10px;
-     background-color: #f7f7f7;
-     padding: 10px;
-     margin-bottom: 10px;
-     text-align: left;
-   }
-   .chat-message {
-     margin: 8px 0;
-     padding: 10px 15px;
-     border-radius: 20px;
-     display: inline-block;
-     animation: fadeIn 0.3s ease;
-     max-width: 80%;
-     line-height: 1.4;
-   }
-   .user-message {
-     background-color: #cfe9ff;
-     float: right;
-     clear: both;
-   }
-   .bot-message {
-     background-color: #ffd6e0;
-     float: left;
-     clear: both;
-   }
-   @keyframes fadeIn {
-     from { opacity: 0; transform: translateY(5px); }
-     to { opacity: 1; transform: translateY(0); }
-   }
-   .input-row {
-     display: flex;
-     gap: 10px;
-   }
-   input {
-     flex: 1;
-     padding: 10px;
-     border-radius: 15px;
-     border: 1px solid #ccc;
-     font-size: 1em;
-   }
-   button {
-     padding: 10px 15px;
-     border: none;
-     border-radius: 15px;
-     background-color: #2a5d9f;
-     color: white;
-     cursor: pointer;
-     font-weight: bold;
-   }
-   button:hover {
-     background-color: #1c4479;
-   }
-   #suggested-prompts {
-     margin: 15px 0;
-   }
-   #suggested-prompts p {
-     font-size: 0.95em;
-     margin-bottom: 8px;
-     color: #444;
-   }
-   #suggested-prompts button {
-     background-color: #d4f4dd;
-     color: #2a5d9f;
-     border: none;
-     margin: 5px 4px;
-     padding: 8px 14px;
-     border-radius: 18px;
-     font-size: 0.85em;
-     cursor: pointer;
-   }
-   #suggested-prompts button:hover {
-     background-color: #c2eecb;
-   }
-   /* Style for buttons added dynamically into the chat by the bot */
-   .chat-button {
-     background-color: #d4f4dd !important; /* Use !important to override generic button styles if needed */
-     color: #2a5d9f !important;
-     border: none !important;
-     margin: 5px 4px !important;
-     padding: 8px 14px !important;
-     border-radius: 18px !important;
-     font-size: 0.85em !important;
-     cursor: pointer !important;
-   }
-   .chat-button:hover {
-     background-color: #c2eecb !important;
-   }
- </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Beibei Amigos Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Quicksand', sans-serif;
+    margin: 0;
+    background: linear-gradient(to bottom right, #fce3ec, #d8f3dc);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    max-width: 420px;
+    background-color: #d0f0ffdd;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    text-align: center;
+    height: 80vh; /* Adjust as needed */
+  }
+  h1 {
+    font-size: 1.5em;
+    color: #2a5d9f;
+    margin-bottom: 10px;
+  }
+  .chat-box {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 10px;
+    background-color: #f7f7f7;
+    padding: 10px;
+    margin: 10px 0;
+    text-align: left;
+  }
+  .chat-message {
+    margin: 8px 0;
+    padding: 10px 15px;
+    border-radius: 20px;
+    display: inline-block;
+    animation: fadeIn 0.3s ease;
+    max-width: 80%;
+    line-height: 1.4;
+  }
+  .user-message {
+    background-color: #cfe9ff;
+    float: right;
+    clear: both;
+  }
+  .bot-message {
+    background-color: #ffd6e0;
+    float: left;
+    clear: both;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .input-row {
+    display: flex;
+    gap: 10px;
+  }
+  input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+  }
+  button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 15px;
+    background-color: #2a5d9f;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:hover {
+    background-color: #1c4479;
+  }
+  #suggested-prompts {
+    margin: 10px 0;
+  }
+  #suggested-prompts p {
+    font-size: 0.85em;
+    margin-bottom: 8px;
+    color: #444;
+  }
+  #suggested-prompts button {
+    background-color: #d4f4dd;
+    color: #2a5d9f;
+    border: none;
+    margin: 4px;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 0.85em;
+    cursor: pointer;
+  }
+  #suggested-prompts button:hover {
+    background-color: #c2eecb;
+  }
+  .chat-button {
+    background-color: #d4f4dd !important;
+    color: #2a5d9f !important;
+    border: none !important;
+    margin: 5px 4px !important;
+    padding: 8px 14px !important;
+    border-radius: 18px !important;
+    font-size: 0.85em !important;
+    cursor: pointer !important;
+  }
+  .chat-button:hover {
+    background-color: #c2eecb !important;
+  }
+</style>
 </head>
+
 <body>
- <div class="chat-container">
-   <h1>Chat with Beibei Amigos 💬</h1>
-   <video id="introVideo" autoplay loop muted playsinline style="width: 100%; max-width: 360px; height: auto; border-radius: 20px; display: block; margin: 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
-     <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
-     Your browser does not support the video tag.
-   </video>
-   
-   <div id="suggested-prompts">
-     <p>💬 Try asking:</p>
-     <button onclick="startTuitionFlow()">What is the tuition?</button>
-     <button onclick="window.open('https://beibeiamigos.com/schedule', '_blank')">🗓️ Book a Tour</button>
-     <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
-     <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">Montessori vs Traditional?</button>
-     <a href="tel:6029964990" style="text-decoration: none;"><button>📞 Call the School</button></a>
-   </div>
-   <div class="chat-box" id="chat-box"></div>
-   <div class="input-row">
-     <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
-     <button onclick="sendMessage()">Send</button>
-   </div>
- </div>
- <script>
-   let tuitionData = { days: null, type: null, age: null, program: null };
-   const tuitionTable = {
-     "1_3_Half_Traditional": 679,
-     "1_3_Full_Traditional": 825,
-     "1_4_Half_Traditional": 809,
-     "1_4_Full_Traditional": 956,
-     "1_5_Half_Traditional": 927,
-     "1_5_Full_Traditional": 1196,
-     "2_3_Half_Traditional": 647,
-     "2_3_Full_Traditional": 803,
-     "2_4_Half_Traditional": 790,
-     "2_4_Full_Traditional": 932,
-     "2_5_Half_Traditional": 920,
-     "2_5_Full_Traditional": 1127,
-     "2_3_Half_Montessori": 700,
-     "2_3_Full_Montessori": 850,
-     "2_4_Half_Montessori": 840,
-     "2_4_Full_Montessori": 950,
-     "2_5_Half_Montessori": 1000,
-     "2_5_Full_Montessori": 1225,
-     "3_3_Half_Traditional": 594,
-     "3_3_Full_Traditional": 776,
-     "3_4_Half_Traditional": 734,
-     "3_4_Full_Traditional": 898,
-     "3_5_Half_Traditional": 809,
-     "3_5_Full_Traditional": 1047,
-     "3_3_Half_Montessori": 635,
-     "3_3_Full_Montessori": 795,
-     "3_4_Half_Montessori": 776,
-     "3_4_Full_Montessori": 912,
-     "3_5_Half_Montessori": 907,
-     "3_5_Full_Montessori": 1112,
-     "4_3_Half_Traditional": 594,
-     "4_3_Full_Traditional": 776,
-     "4_4_Half_Traditional": 734,
-     "4_4_Full_Traditional": 898,
-     "4_5_Half_Traditional": 809,
-     "4_5_Full_Traditional": 1047,
-     "4_3_Half_Montessori": 635,
-     "4_3_Full_Montessori": 795,
-     "4_4_Half_Montessori": 776,
-     "4_4_Full_Montessori": 912,
-     "4_5_Half_Montessori": 907,
-     "4_5_Full_Montessori": 1112,
-     "5_3_Half_Traditional": 594,
-     "5_3_Full_Traditional": 776,
-     "5_4_Half_Traditional": 734,
-     "5_4_Full_Traditional": 898,
-     "5_5_Half_Traditional": 809,
-     "5_5_Full_Traditional": 1047,
-     "5_3_Half_Montessori": 635,
-     "5_3_Full_Montessori": 795,
-     "5_4_Half_Montessori": 776,
-     "5_4_Full_Montessori": 912,
-     "5_5_Half_Montessori": 907,
-     "5_5_Full_Montessori": 1112
-   };
+<div class="chat-container">
+  <h1>Chat with Beibei Amigos 💬</h1>
 
-   function sendMessage() {
-     const inputField = document.getElementById("user-input");
-     const chatBox = document.getElementById("chat-box");
-     const userMessage = inputField.value.trim();
-     if (!userMessage) return;
-     // Display user message
-     const userMessageDiv = document.createElement('div');
-     userMessageDiv.className = 'chat-message user-message';
-     userMessageDiv.innerHTML = `<strong>You:</strong> ${userMessage}`;
-     chatBox.appendChild(userMessageDiv);
-     inputField.value = "";
-     chatBox.scrollTop = chatBox.scrollHeight;
+  <video id="introVideo" autoplay loop muted playsinline style="width: 100%; max-width: 360px; height: auto; border-radius: 20px; display: block; margin: 10px auto; box-shadow: 0 6px 12px rgba(0,0,0,0.2);">
+    <source src="https://www.beibeiamigos.com/wp-content/uploads/2025/04/Introduction_video_beibei_4_5_mp4_V1.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
-     fetch("/chat", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ message: userMessage })
-     }).then(res => res.json()).then(result => {
-       let botResponse = result.response;
-       if (botResponse.toLowerCase().includes("do you want to book a tour")) {
-         botResponse += '<br><a href="https://beibeiamigos.com/schedule" target="_blank"><button class="chat-button">🗓️ Book a Tour</button></a>';
-       }
-       // Display bot response
-       const botMessageDiv = document.createElement('div');
-       botMessageDiv.className = 'chat-message bot-message';
-       botMessageDiv.innerHTML = `<strong>Assistant:</strong> ${botResponse}`;
-       chatBox.appendChild(botMessageDiv);
-       chatBox.scrollTop = chatBox.scrollHeight;
-     }).catch(() => {
-       const errorDiv = document.createElement('div');
-       errorDiv.className = 'chat-message bot-message';
-       errorDiv.innerHTML = `<strong>Error:</strong> Unable to reach the chatbot API.`;
-       chatBox.appendChild(errorDiv);
-       chatBox.scrollTop = chatBox.scrollHeight;
-     });
-   }
+  <div id="suggested-prompts">
+    <p>💬 Try asking:</p>
+    <button onclick="startTuitionFlow()">What is the tuition?</button>
+    <button onclick="window.open('https://beibeiamigos.com/schedule', '_blank')">📅 Book a Tour</button>
+    <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
+    <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">Montessori vs Traditional?</button>
+    <a href="tel:6029964990" style="text-decoration: none;"><button>📞 Call the School</button></a>
+  </div>
 
-   function sendPrompt(message) {
-     document.getElementById("user-input").value = message;
-     sendMessage();
-   }
+  <div class="chat-box" id="chat-box"></div>
 
-   function addBotMessage(message) {
-     const chatBox = document.getElementById("chat-box");
-     const messageNode = document.createElement('div');
-     messageNode.className = 'chat-message bot-message';
-     messageNode.innerHTML = message; // Allow HTML in message for buttons
-     chatBox.appendChild(messageNode);
-     setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50); // Scroll after DOM update
-   }
+  <div class="input-row">
+    <input type="text" id="user-input" placeholder="Ask me about the preschool..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
 
-   function addOptions(options, callback) {
-     const chatBox = document.getElementById("chat-box");
-     const buttonWrapper = document.createElement('div');
-     // Assign a class that makes it look like a bot message bubble, but contains buttons
-     buttonWrapper.className = 'chat-message bot-message'; 
-     buttonWrapper.style.backgroundColor = "transparent"; // Optional: if you don't want a bubble around buttons
-     
-     let buttonsHTML = options.map(opt => 
-         `<button class='chat-button' onclick='${callback.name}("${opt}")'>${opt}</button>`
-     ).join(' '); // Join with space for multiple buttons in one line
-     
-     buttonWrapper.innerHTML = buttonsHTML;
-     chatBox.appendChild(buttonWrapper);
-     setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50); // Scroll after DOM update
-   }
-   
-   function startTuitionFlow() {
-     addBotMessage("How many days would you like your child to attend?");
-     addOptions(['3', '4', '5'], selectDays);
-   }
+<script>
+  let tuitionData = { days: null, type: null, age: null, program: null };
 
-   function selectDays(days) {
-     addUserMessageFromChoice(days + " days");
-     tuitionData.days = days;
-     addBotMessage("Would you like half days or full days?");
-     addOptions(['Half', 'Full'], selectType);
-   }
+  function sendMessage() {
+    const inputField = document.getElementById("user-input");
+    const chatBox = document.getElementById("chat-box");
+    const userMessage = inputField.value.trim();
+    if (!userMessage) return;
 
-   function selectType(type) {
-     addUserMessageFromChoice(type + " days");
-     tuitionData.type = type;
-     addBotMessage("What is your child's age?");
-     addOptions(['1', '2', '3', '4', '5'], selectAge);
-   }
+    const userMessageDiv = document.createElement('div');
+    userMessageDiv.className = 'chat-message user-message';
+    userMessageDiv.innerHTML = `<strong>You:</strong> ${userMessage}`;
+    chatBox.appendChild(userMessageDiv);
+    inputField.value = "";
+    chatBox.scrollTop = chatBox.scrollHeight;
 
-   function selectAge(age) {
-     addUserMessageFromChoice("Age " + age);
-     tuitionData.age = age;
-     addBotMessage("Do you prefer the Montessori or Traditional program?");
-     addOptions(['Montessori', 'Traditional'], selectProgram);
-   }
+    fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userMessage })
+    }).then(res => res.json()).then(result => {
+      let botResponse = result.response;
+      if (botResponse.toLowerCase().includes("do you want to book a tour")) {
+        botResponse += '<br><a href="https://beibeiamigos.com/schedule" target="_blank"><button class="chat-button">🗓️ Book a Tour</button></a>';
+      }
+      const botMessageDiv = document.createElement('div');
+      botMessageDiv.className = 'chat-message bot-message';
+      botMessageDiv.innerHTML = `<strong>Assistant:</strong> ${botResponse}`;
+      chatBox.appendChild(botMessageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }).catch(() => {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'chat-message bot-message';
+      errorDiv.innerHTML = `<strong>Error:</strong> Unable to reach the chatbot API.`;
+      chatBox.appendChild(errorDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+  }
 
-   function selectProgram(program) {
-     addUserMessageFromChoice(program + " program");
-     tuitionData.program = program;
-     const key = `${tuitionData.age}_${tuitionData.days}_${tuitionData.type}_${tuitionData.program}`;
-     const tuition = tuitionTable[key];
-     const message = tuition ? `Based on your selections, the monthly tuition is <strong>$${tuition}</strong>.` : `Sorry, we don’t have tuition information for that combination.`;
-     addBotMessage(message);
-     // Reset tuitionData for a new query
-     tuitionData = { days: null, type: null, age: null, program: null };
-   }
+  function sendPrompt(message) {
+    document.getElementById("user-input").value = message;
+    sendMessage();
+  }
 
-   // Helper function to show user's choice from buttons
-   function addUserMessageFromChoice(choiceText) {
-       const chatBox = document.getElementById("chat-box");
-       const userMessageDiv = document.createElement('div');
-       userMessageDiv.className = 'chat-message user-message';
-       userMessageDiv.innerHTML = `<strong>You:</strong> ${choiceText}`;
-       chatBox.appendChild(userMessageDiv);
-       chatBox.scrollTop = chatBox.scrollHeight;
-   }
+  function addBotMessage(message) {
+    const chatBox = document.getElementById("chat-box");
+    const messageNode = document.createElement('div');
+    messageNode.className = 'chat-message bot-message';
+    messageNode.innerHTML = message;
+    chatBox.appendChild(messageNode);
+    setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+  }
 
-   document.getElementById("user-input").addEventListener("keydown", function(event) {
-     if (event.key === "Enter") {
-       event.preventDefault();
-       sendMessage();
-     }
-   });
+  function addOptions(options, callback) {
+    const chatBox = document.getElementById("chat-box");
+    const buttonWrapper = document.createElement('div');
+    buttonWrapper.className = 'chat-message bot-message'; 
+    buttonWrapper.style.backgroundColor = "transparent";
+    buttonWrapper.innerHTML = options.map(opt => 
+      `<button class='chat-button' onclick='${callback.name}("${opt}")'>${opt}</button>`
+    ).join(' ');
+    chatBox.appendChild(buttonWrapper);
+    setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+  }
 
-   // Add mute/unmute toggle for video
-   const video = document.getElementById('introVideo');
-   const toggleButton = document.createElement('button');
-   // Video starts muted, so button should offer to "Unmute"
-   toggleButton.textContent = '🔈 Unmute'; 
-   toggleButton.style.margin = '10px auto';
-   toggleButton.style.display = 'block';
-   toggleButton.style.background = '#ffd6e0'; // Style matching bot messages
-   toggleButton.style.color = '#2a5d9f';      // Contrasting text color
-   toggleButton.style.border = 'none';
-   toggleButton.style.borderRadius = '10px';
-   toggleButton.style.padding = '8px 12px';
-   toggleButton.style.cursor = 'pointer';
-   toggleButton.style.fontWeight = 'normal'; // Different from main send button
-   
-   toggleButton.onclick = function () {
-     video.muted = !video.muted;
-     // Update button text based on the new video.muted state
-     toggleButton.textContent = video.muted ? '🔈 Unmute' : '🔇 Mute';
-   };
-   // Insert the button after the video element
-   if (video && video.parentNode) {
-       video.insertAdjacentElement('afterend', toggleButton);
-   }
+  function startTuitionFlow() {
+    addBotMessage("How many days would you like your child to attend?");
+    addOptions(['3', '4', '5'], selectDays);
+  }
 
- </script>
+  function selectDays(days) {
+    addUserMessageFromChoice(days + " days");
+    tuitionData.days = days;
+    addBotMessage("Would you like half days or full days?");
+    addOptions(['Half', 'Full'], selectType);
+  }
+
+  function selectType(type) {
+    addUserMessageFromChoice(type + " days");
+    tuitionData.type = type;
+    addBotMessage("What is your child's age?");
+    addOptions(['1', '2', '3', '4', '5'], selectAge);
+  }
+
+  function selectAge(age) {
+    addUserMessageFromChoice("Age " + age);
+    tuitionData.age = age;
+    addBotMessage("Do you prefer the Montessori or Traditional program?");
+    addOptions(['Montessori', 'Traditional'], selectProgram);
+  }
+
+  function selectProgram(program) {
+    addUserMessageFromChoice(program + " program");
+    tuitionData.program = program;
+    const key = `${tuitionData.age}_${tuitionData.days}_${tuitionData.type}_${tuitionData.program}`;
+    const tuition = tuitionTable[key];
+    const message = tuition ? `Based on your selections, the monthly tuition is <strong>$${tuition}</strong>.` : `Sorry, we don’t have tuition information for that combination.`;
+    addBotMessage(message);
+    tuitionData = { days: null, type: null, age: null, program: null };
+  }
+
+  function addUserMessageFromChoice(choiceText) {
+    const chatBox = document.getElementById("chat-box");
+    const userMessageDiv = document.createElement('div');
+    userMessageDiv.className = 'chat-message user-message';
+    userMessageDiv.innerHTML = `<strong>You:</strong> ${choiceText}`;
+    chatBox.appendChild(userMessageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  document.getElementById("user-input").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Mute/unmute toggle for video
+  const video = document.getElementById('introVideo');
+  const toggleButton = document.createElement('button');
+  toggleButton.textContent = '🔈 Unmute'; 
+  toggleButton.style.margin = '10px auto';
+  toggleButton.style.display = 'block';
+  toggleButton.style.background = '#ffd6e0';
+  toggleButton.style.color = '#2a5d9f';
+  toggleButton.style.border = 'none';
+  toggleButton.style.borderRadius = '10px';
+  toggleButton.style.padding = '8px 12px';
+  toggleButton.style.cursor = 'pointer';
+  toggleButton.style.fontWeight = 'normal';
+  toggleButton.onclick = function () {
+    video.muted = !video.muted;
+    toggleButton.textContent = video.muted ? '🔈 Unmute' : '🔇 Mute';
+  };
+  if (video && video.parentNode) {
+    video.insertAdjacentElement('afterend', toggleButton);
+  }
+</script>
 </body>
 </html>
