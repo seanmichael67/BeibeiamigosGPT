@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from flask_cors import CORS
+import time
 
 # Load environment variables
 load_dotenv()
@@ -25,7 +26,7 @@ CORS(app)
 # Log chat messages
 def log_chat(user_msg, bot_response, school_id="beibei", session_id="anonymous"):
     try:
-        supabase.table("chat_logs").insert({
+        return supabase.table("chat_logs").insert({
             "timestamp": datetime.utcnow().isoformat(),
             "user_msg": user_msg,
             "bot_response": bot_response,
@@ -34,32 +35,72 @@ def log_chat(user_msg, bot_response, school_id="beibei", session_id="anonymous")
         }).execute()
     except Exception as e:
         print(f"Logging failed: {e}")
+        return None
+
+def update_chat_response(log_id, bot_response):
+    if not log_id:
+        return
+    try:
+        supabase.table("chat_logs").update({
+            "bot_response": bot_response
+        }).eq("id", log_id).execute()
+    except Exception as e:
+        print(f"Log update failed: {e}")
 
 # Chat endpoint
 @app.route("/chat", methods=["POST"])
 def chat():
+    user_msg = None
+    session_id = request.remote_addr or "unknown"
+    log_id = None
     try:
-        data = request.get_json()
-        user_msg = data.get("message")
-        session_id = request.remote_addr or "unknown"
+        data = request.get_json() or {}
+        user_msg = (data.get("message") or "").strip()
+        if not user_msg:
+            return jsonify({"error": "Message is required."}), 400
+
+        log_result = log_chat(
+            user_msg,
+            "PENDING_RESPONSE",
+            school_id="beibei",
+            session_id=session_id
+        )
+        if log_result and getattr(log_result, "data", None):
+            log_id = log_result.data[0].get("id")
 
         thread = openai.beta.threads.create()
         openai.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_msg)
         run = openai.beta.threads.runs.create(thread_id=thread.id, assistant_id=ASSISTANT_ID)
 
+        start_time = time.time()
         while True:
             run_status = openai.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
             if run_status.status == "completed":
                 break
+            if run_status.status in ("failed", "cancelled", "expired"):
+                raise RuntimeError(f"Assistant run ended with status: {run_status.status}")
+            if time.time() - start_time > 25:
+                raise TimeoutError("Assistant run timed out")
+            time.sleep(0.5)
 
         messages = openai.beta.threads.messages.list(thread_id=thread.id)
         bot_reply = messages.data[0].content[0].text.value
 
-        log_chat(user_msg, bot_reply, school_id="beibei", session_id=session_id)
+        update_chat_response(log_id, bot_reply)
         return jsonify({"response": bot_reply})
 
     except Exception as e:
         print(f"Error: {e}")
+        if user_msg:
+            if log_id:
+                update_chat_response(log_id, "ERROR_RESPONSE_NOT_SENT")
+            else:
+                log_chat(
+                    user_msg,
+                    "ERROR_RESPONSE_NOT_SENT",
+                    school_id="beibei",
+                    session_id=session_id
+                )
         return jsonify({"error": "Something went wrong."}), 500
 
 # Serve chatbot.html at root
