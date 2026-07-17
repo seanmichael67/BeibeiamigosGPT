@@ -132,7 +132,7 @@
   <div id="suggested-prompts">
     <p>💬 Try asking:</p>
     <button onclick="startTuitionFlow()">What is the tuition?</button>
-    <button onclick="window.open('https://beibeiamigos.com/schedule', '_blank')">🗓️ Book a Tour</button>
+    <button onclick="window.open('https://www.beibeiamigos.com/tour/', '_blank')">🗓️ Book a Tour</button>
     <button onclick="sendPrompt('What languages do you teach?')">What languages do you teach?</button>
     <button onclick="sendPrompt('What is the difference between Montessori and Traditional Programs?')">Montessori vs Traditional?</button>
     <a href="tel:6029964990" style="text-decoration: none;"><button>📞 Call the School</button></a>
@@ -224,7 +224,7 @@
     }).then(res => res.json()).then(result => {
       let botResponse = result.response;
       if (botResponse.toLowerCase().includes("do you want to book a tour")) {
-        botResponse += '<br><a href="https://beibeiamigos.com/schedule" target="_blank"><button class="chat-button">🗓️ Book a Tour</button></a>';
+        botResponse += '<br><a href="https://www.beibeiamigos.com/tour/" target="_blank"><button class="chat-button">🗓️ Book a Tour</button></a>';
       }
       // Display bot response
       const botMessageDiv = document.createElement('div');
@@ -364,6 +364,5 @@
 </script>
 </body>
 </html>
-
 
 
